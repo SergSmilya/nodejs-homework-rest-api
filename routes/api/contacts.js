@@ -16,7 +16,7 @@ router.get("/", async (req, res, next) => {
   try {
     res.status(200).json(await listContacts());
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    next(error);
   }
 });
 
@@ -25,32 +25,31 @@ router.get("/:contactId", async (req, res, next) => {
 
   try {
     const result = await getContactById(contactId);
-
     if (!result) {
       throw HttpError(404, "Not found");
     }
+
     res.status(200).json(result);
   } catch (error) {
-    const { status = 500, message = "Server error" } = error;
-    res.status(status).json({ message });
+    next(error);
   }
 });
 
 router.post("/", async (req, res, next) => {
   try {
-    const { error } = shema.validate(req.body);
-    if (error) {
-      throw HttpError(400, error.message);
+    if (Object.keys(req.body).length === 0) {
+      throw HttpError(400, `missing fields`);
     }
+    const { error } = shema.validate(req.body);
 
-    // ! зробити валідацію правильною (номер це намберб, імеіл це імеіл)
-    // ! розібратися що саме записати в error.message згідно тех.завдання
+    if (error) {
+      throw HttpError(400, `missing ${error.message} field `);
+    }
 
     const result = await addContact(req.body);
     res.status(201).json(result);
   } catch (error) {
-    const { status = 500, message = "Server error" } = error;
-    res.status(status).json({ message });
+    next(error);
   }
 });
 
@@ -65,30 +64,30 @@ router.delete("/:contactId", async (req, res, next) => {
     }
     res.status(200).json({ message: "contact deleted" });
   } catch (error) {
-    const { status = 500, message = "Server error" } = error;
-    res.status(status).json({ message });
+    next(error);
   }
 });
 
 router.put("/:contactId", async (req, res, next) => {
   const { contactId } = req.params;
-  // ? Якщо body немає, повертає json з ключем {"message": "missing fields"} і статусом 400
-  try {
-    const { error } = shema.validate(req.body);
 
+  try {
+    if (Object.keys(req.body).length === 0) {
+      throw HttpError(400, `missing fields`);
+    }
+    const { error } = shema.validate(req.body);
     if (error) {
-      throw HttpError(400, "missing fields");
+      throw HttpError(400, `missing ${error.message} field `);
     }
 
-    // ? За результатом роботи функції повертає оновлений об'єкт контакту і статусом 200. В іншому випадку, повертає json з ключем "message": "Not found" і статусом 404
     const result = await updateContact(contactId, req.body);
+    if (!result) {
+      throw HttpError(404, "Not found");
+    }
     res.status(200).json(result);
   } catch (error) {
-    const { status = 500, message = "Server error" } = error;
-    res.status(status).json({ message });
+    next(error);
   }
 });
 
 module.exports = router;
-
-// ? Розділити по файлам, уникнути дублювання коду, рефакторинг
