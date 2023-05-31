@@ -26,12 +26,16 @@ const contactSchema = new Schema(
 const schema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
-  phone: Joi.string().required(),
+  phone: Joi.number().required(),
   favorite: Joi.boolean(),
+});
+
+const updateFavoriteFieldSchema = Joi.object({
+  favorite: Joi.boolean().required(),
 });
 
 contactSchema.post("save", handleMongooseError);
 
 const Contact = model("contact", contactSchema);
 
-module.exports = { Contact, schema };
+module.exports = { Contact, schema, updateFavoriteFieldSchema };
