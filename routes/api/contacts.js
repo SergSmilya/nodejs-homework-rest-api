@@ -9,12 +9,12 @@ const {
   updateStatusContact,
 } = require("../../controllers/contacts");
 
-const { validateBody, isValidId } = require("../../middlewares");
+const { validateBody, isValidId, validateToken } = require("../../middlewares");
 const { schema, updateFavoriteFieldSchema } = require("../../models/contact");
 
 const router = express.Router();
 
-router.get("/", getAllContacts);
+router.get("/", validateToken, getAllContacts);
 
 router.get("/:contactId", isValidId, getContact);
 

@@ -22,8 +22,7 @@ const register = async (req, res) => {
   });
 
   res.status(201).json({
-    name: newUser.name,
-    email: newUser.email,
+    user: { email: newUser.email, subscription: newUser.subscription },
   });
 };
 
@@ -53,7 +52,10 @@ const login = async (req, res) => {
   });
 };
 
+const logout = async (req, res) => {};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
+  logout: ctrlWrapper(logout),
 };
