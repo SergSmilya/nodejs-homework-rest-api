@@ -1,25 +1,30 @@
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 
-// const { HttpError } = require("../helpers");
+const { User } = require("../models/user");
+const { HttpError } = require("../helpers");
 
-// const { SECRET_KEY } = process.env;
+const { SECRET_KEY } = process.env;
 
 const validateToken = async (req, res, next) => {
-  //   const { token } = req.body;
-  console.log(req.authorization);
+  const { authorization = "" } = req.headers;
+  const [bearer, token] = authorization.split(" ");
 
-  //   if (!token) {
-  //     throw HttpError(401, "Not authorized");
-  //   }
+  if (bearer !== "Bearer") {
+    next(HttpError(401, "Not authorized"));
+  }
 
-  //   try {
-  //     const { id } = jwt.verify(token, SECRET_KEY);
-  //     console.log(id);
-  //   } catch (error) {
-  //     next(HttpError(401, "Not authorized"));
-  //   }
+  try {
+    const { id } = jwt.verify(token, SECRET_KEY);
+    const user = await User.findById(id);
+    if (!user || !user.token || user.toke === token) {
+      next(HttpError(401, "Not authorized"));
+    }
+    req.user = user;
 
-  next();
+    next();
+  } catch (error) {
+    next(HttpError(401, "Not authorized"));
+  }
 };
 
 module.exports = validateToken;
