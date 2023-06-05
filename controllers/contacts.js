@@ -3,8 +3,14 @@ const { Contact } = require("../models/contact");
 const { HttpError, ctrlWrapper } = require("../helpers");
 
 const getAllContacts = async (req, res) => {
+  console.log(req.query.favorite);
   const { _id: owner } = req.user;
-  res.status(200).json(await Contact.find({ owner }));
+  res.json(
+    await Contact.find({
+      owner,
+      // favorite: req.query.favorite,
+    }_, {skip:1, limit:20})
+  );
 };
 
 const getContact = async (req, res) => {
