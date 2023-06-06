@@ -4,16 +4,22 @@ const { ctrlWrapper } = require("../helpers");
 
 async function filterContacts(req, res, next) {
   const { _id: owner } = req.user;
-  if (Object.keys(req.query).length === 0) {
+  const { favorite, page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
+  if (favorite === undefined) {
     next();
     return;
   }
-  const { favorite } = req.query;
+
   res.json(
-    await Contact.find({
-      owner,
-      favorite,
-    })
+    await Contact.find(
+      {
+        owner,
+        favorite,
+      },
+      "",
+      { skip, limit }
+    )
   );
 }
 
