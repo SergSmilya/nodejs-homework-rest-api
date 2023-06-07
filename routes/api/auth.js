@@ -16,16 +16,16 @@ const {
 
 const router = express.Router();
 
-router.post("/users/register", validateBody(userRegisterSchema), register);
+router.post("/register", validateBody(userRegisterSchema), register);
 
-router.post("/users/login", validateBody(userLoginSchema), login);
+router.post("/login", validateBody(userLoginSchema), login);
 
-router.get("/users/current", validateToken, getCurrent);
+router.get("/current", validateToken, getCurrent);
 
-router.post("/users/logout", validateToken, logout);
+router.post("/logout", validateToken, logout);
 
 router.patch(
-  "/users/subscription",
+  "/subscription",
   validateToken,
   validateBody(userUpdateSubscrField),
   updateSubscriptionUser
