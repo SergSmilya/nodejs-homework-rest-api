@@ -6,8 +6,9 @@ const {
   logout,
   getCurrent,
   updateSubscriptionUser,
+  updateAvatar,
 } = require("../../controllers/auth");
-const { validateBody, validateToken } = require("../../middlewares");
+const { validateBody, validateToken, upload } = require("../../middlewares");
 const {
   userRegisterSchema,
   userLoginSchema,
@@ -30,5 +31,7 @@ router.patch(
   validateBody(userUpdateSubscrField),
   updateSubscriptionUser
 );
+
+router.patch("/avatars", validateToken, upload.single("avatar"), updateAvatar);
 
 module.exports = router;
