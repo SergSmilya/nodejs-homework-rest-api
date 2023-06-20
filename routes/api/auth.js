@@ -7,12 +7,17 @@ const {
   getCurrent,
   updateSubscriptionUser,
   updateAvatar,
+  verificationToken,
+  resendVerifyToken,
 } = require("../../controllers/auth");
+
 const { validateBody, validateToken, upload } = require("../../middlewares");
+
 const {
   userRegisterSchema,
   userLoginSchema,
   userUpdateSubscrField,
+  verifyEmailSchema,
 } = require("../../models/user");
 
 const router = express.Router();
@@ -33,5 +38,13 @@ router.patch(
 );
 
 router.patch("/avatars", validateToken, upload.single("avatar"), updateAvatar);
+
+router.get("/verify/:verificationToken", verificationToken);
+
+router.post(
+  "/verify",
+  validateBody(verifyEmailSchema, "missing required field email"),
+  resendVerifyToken
+);
 
 module.exports = router;
